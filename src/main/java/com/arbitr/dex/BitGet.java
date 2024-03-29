@@ -43,15 +43,9 @@ public class BitGet implements Dex {
                     .build();
             var httpResponse = client.execute(request);
             result = EntityUtils.toString(httpResponse.getEntity());
-            if (result.contains("does not exist") || result.contains("\"data\":null")) {
-                throw new Exception("400");
-            }
-
         } catch (Exception e) {
             log.error(e.getMessage());
-            if (e.getMessage().contains("400")) {
-                return null;
-            }
+            return null;
         }
         return result;
     }

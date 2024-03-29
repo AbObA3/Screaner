@@ -41,14 +41,9 @@ public class OKX implements Dex {
                     .build();
             var httpResponse = client.execute(request);
             result = EntityUtils.toString(httpResponse.getEntity());
-            if (result.contains("Instrument ID doesn't exist")) {
-                throw new Exception("400");
-            }
         } catch (Exception e) {
-            if (e.getMessage().equals("400")) {
-                return null;
-            }
             log.error(e.getMessage());
+            return null;
         }
         return result;
     }

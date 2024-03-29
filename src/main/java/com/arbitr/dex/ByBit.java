@@ -46,14 +46,9 @@ public class ByBit implements Dex{
                     .build();
             var httpResponse = client.execute(request);
             result = EntityUtils.toString(httpResponse.getEntity());
-            if (result.contains("params error: symbol invalid") || result.contains("\"list\":[]")) {
-                throw new Exception("400");
-            }
         } catch (Exception e) {
             log.error(e.getMessage());
-            if (e.getMessage().contains("400")) {
-                return null;
-            }
+            return null;
         }
         return result;
     }

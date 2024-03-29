@@ -43,15 +43,9 @@ public class LBank implements Dex {
             result = EntityUtils.toString(httpResponse.getEntity());
             result = result.substring(result.indexOf(currency + SeparatorEnum.LBANK.getFundingSeparator() + USDT));
             result = result.substring(0, result.indexOf("}"));
-
-            if (result.contains("success")) {
-                throw new Exception("400");
-            }
         } catch (Exception e) {
             log.error(e.getMessage());
-            if (e.getMessage().contains("400")) {
-                return null;
-            }
+            return null;
         }
         return result;
     }
