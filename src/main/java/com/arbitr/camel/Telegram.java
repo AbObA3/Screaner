@@ -19,6 +19,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Collectors;
+
 @ApplicationScoped
 @Log4j2
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -92,8 +93,9 @@ public class Telegram {
                 Builder.appendList(repository
                         .findAllByCurrency(message.getText())
                         .subscribe().asStream().toList());
-                msg.setText(Builder.getStringBuilder());
                 isRequestCurrency = Boolean.FALSE;
+                if (!Builder.isEmpty()) msg.setText(Builder.getStringBuilder());
+                else msg.setText("Пусто");
                 return msg;
             } else if ("Показать по значению ставки".equals(message.getText())) {
                 replyMarkup = ReplyKeyboardMarkup.builder()
@@ -135,8 +137,7 @@ public class Telegram {
                     msg.setText("Пусто");
                 }
                 return msg;
-            } else if (!Builder.isEmpty() && isRequestValue) {
-                msg.setText(Builder.getStringBuilder());
+            } else if ("Дальше".equals(message.getText()) && isRequestValue) {
                 if (!Builder.isEmpty()) {
                     InlineKeyboardButton nextButton = InlineKeyboardButton.builder()
                             .text("Дальше").build();
@@ -151,19 +152,20 @@ public class Telegram {
                             .oneTimeKeyboard(true)
                             .build();
                     msg.setReplyMarkup(replyMarkup);
+                    msg.setText(Builder.getStringBuilder());
+                } else {
+                    msg.setText("Пусто");
                 }
                 return msg;
             } else {
                 msg.setText("Не понял");
                 return msg;
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             msg.setText(e.getMessage());
             return msg;
         }
     }
-
 
 
 }

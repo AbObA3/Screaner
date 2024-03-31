@@ -29,7 +29,7 @@ public class CassandraRepository implements Repository {
 
     @Override
     public void deleteAll() {
-        session.executeReactive("truncate dex.dexes_actual");
+        session.executeAsync("truncate dex.dexes_actual");
     }
 
     public Multi<DexCurrency> findAll() {
@@ -52,7 +52,7 @@ public class CassandraRepository implements Repository {
 
     @Override
     public Uni<Boolean> putDex(DexCurrency dexCurrency) {
-        var insert = session.executeAsync(String.format("insert into dex.dexes_actual(currency, name, last_update_timestamp, current_value, next_value, absolute_current_value) values ('%s','%s', totimestamp(now()), %f, %f, %f)"
+        var insert = session.executeAsync(String.format("insert into dex.dexes_actual(currency, name, last_update_timestamp, current_value, next_value, absolute_current_value) values ('%s','%s', totimestamp(now()), %.4f, %.4f, %.4f)"
                 , dexCurrency.getCurrency(), dexCurrency.getName(), dexCurrency.getCurrentValue(), dexCurrency.getNextValue(), Math.abs(dexCurrency.getCurrentValue())));
         return Uni.createFrom().completionStage(insert).map(AsyncResultSet::wasApplied);
     }
