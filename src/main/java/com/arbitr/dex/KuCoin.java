@@ -48,6 +48,7 @@ public class KuCoin implements Dex {
             return null;
         }
         return result;
+
     }
 
 }
