@@ -12,6 +12,7 @@ import jakarta.inject.Inject;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
+import org.apache.camel.Exchange;
 import org.apache.camel.component.telegram.model.*;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -41,7 +42,8 @@ public class Telegram {
 
     Boolean isRequestFile = Boolean.FALSE;
 
-    public OutgoingTextMessage process(IncomingMessage message) {
+    public OutgoingTextMessage process(Exchange exchange) {
+        IncomingMessage message = (IncomingMessage) exchange.getMessage().getBody();
         OutgoingTextMessage msg = new OutgoingTextMessage();
         try {
             InlineKeyboardButton buttonValue = InlineKeyboardButton.builder()
