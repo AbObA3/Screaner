@@ -14,12 +14,10 @@ import java.util.regex.Pattern;
 public class KuCoinParser implements DexParser {
     @Override
     public Double getFundingRate(String string) {
-
         Pattern pattern = Pattern.compile("\"value\"\\s*:\\s*([^,]+),");
         Matcher matcher = pattern.matcher(string);
 
         if (matcher.find()) {
-            var value = Double.parseDouble(matcher.group(1)) * 100.;
             return Double.parseDouble(matcher.group(1)) * 100.;
         } else {
             log.error("Не найдено");
@@ -31,12 +29,10 @@ public class KuCoinParser implements DexParser {
 
     @Override
     public Double getNextFundingRate(String string) {
-
         Pattern pattern = Pattern.compile("\"predictedValue\"\\s*:\\s*([^}]+)}");
         Matcher matcher = pattern.matcher(string);
 
         if (matcher.find()) {
-            var value = Double.parseDouble(matcher.group(1)) * 100.;
             return Double.parseDouble(matcher.group(1)) * 100.;
         } else {
             log.error("Не найдено");

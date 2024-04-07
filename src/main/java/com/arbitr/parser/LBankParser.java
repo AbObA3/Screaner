@@ -16,7 +16,6 @@ public class LBankParser implements DexParser{
 
     @Override
     public Double getFundingRate(String string) {
-
         Pattern pattern = Pattern.compile("\"fundingRate\":\\s*\"([^\"]+)\"");
         Matcher matcher = pattern.matcher(string);
 

@@ -45,7 +45,7 @@ public class LBank implements Dex {
             result = result.substring(0, result.indexOf("}"));
         } catch (Exception e) {
             log.error(e.getMessage());
-            return null;
+            return Strings.EMPTY;
         }
         return result;
     }

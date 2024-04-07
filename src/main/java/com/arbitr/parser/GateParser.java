@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 public class GateParser implements DexParser {
     @Override
     public Double getFundingRate(String string) {
-
         Pattern pattern = Pattern.compile("\"funding_rate\"\\s*:\\s*\"([^\"]+)\"");
         Matcher matcher = pattern.matcher(string);
 

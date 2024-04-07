@@ -45,7 +45,7 @@ public class BitGet implements Dex {
             result = EntityUtils.toString(httpResponse.getEntity());
         } catch (Exception e) {
             log.error(e.getMessage());
-            return null;
+            return Strings.EMPTY;
         }
         return result;
     }

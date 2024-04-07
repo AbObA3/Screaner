@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 public class OKXParser implements DexParser {
     @Override
     public Double getFundingRate(String string) {
-
         Pattern pattern = Pattern.compile("\"fundingRate\":\\s*\"([^\"]+)\"");
         Matcher matcher = pattern.matcher(string);
 
@@ -29,7 +28,6 @@ public class OKXParser implements DexParser {
 
     @Override
     public Double getNextFundingRate(String string) {
-
         Pattern pattern = Pattern.compile("\"nextFundingRate\":\\s*\"([^\"]+)\"");
         Matcher matcher = pattern.matcher(string);
 
