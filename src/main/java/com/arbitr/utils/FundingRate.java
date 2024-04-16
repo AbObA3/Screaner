@@ -17,4 +17,6 @@ public class FundingRate {
 
     Double nextValue;
 
+    String fundingTime;
+
 }

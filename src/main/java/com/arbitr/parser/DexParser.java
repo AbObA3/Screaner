@@ -7,4 +7,6 @@ public interface DexParser {
     default Double getNextFundingRate(String string) {
         return 0.;
     }
+
+    String getFundingTime(String string);
 }

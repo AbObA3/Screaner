@@ -23,7 +23,7 @@ public class Gate implements Dex {
 
     private static final String BASE_PATH = "https://api.gateio.ws/api/v4";
     private static final String FUNDING = "/futures/usdt/tickers?contract=%s";
-
+    private static final String FUNDING_TIME = "/futures/usdt/contracts/%s";
 
     @Override
     public Double getBalance() {
@@ -48,4 +48,21 @@ public class Gate implements Dex {
         }
         return result;
     }
+
+    @Override
+    public String getFundingTime(String currency) {
+        var result = Strings.EMPTY;
+        try (var client = HttpClients.custom().build()) {
+            var request = RequestBuilder.get()
+                    .setUri(String.format(BASE_PATH + FUNDING_TIME, currency + SeparatorEnum.GATE.getFundingSeparator() + USDT))
+                    .build();
+            var httpResponse = client.execute(request);
+            result = EntityUtils.toString(httpResponse.getEntity());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return Strings.EMPTY;
+        }
+        return result;
+    }
+
 }

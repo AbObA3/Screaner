@@ -27,18 +27,10 @@ public class DatabaseInitCassandra implements DatabaseInit {
                 "    current_value          DOUBLE,\n" +
                 "    next_value             DOUBLE,\n" +
                 "    absolute_current_value DOUBLE,\n" +
-                "    last_update_timestamp  TIMESTAMP,\n" +
+                "    funding_time           TEXT,\n" +
+                "    last_update_timestamp  TIMESTAMP ,\n" +
                 "    primary key (currency, name)\n" +
                 ");");
-        session.execute("CREATE TABLE IF NOT EXISTS " + DEX_KEYSPACE + "." + DEX_HISTORY_TABLE_NAME + "\n" +
-                "(\n" +
-                "    name                  TEXT,\n" +
-                "    currency              TEXT,\n" +
-                "    current_value         DOUBLE,\n" +
-                "    next_value            DOUBLE,\n" +
-                "    last_update_timestamp timestamp,\n" +
-                "    primary key ((currency, name), last_update_timestamp)\n" +
-                ") WITH CLUSTERING ORDER BY (last_update_timestamp DESC);");
     }
 
 }

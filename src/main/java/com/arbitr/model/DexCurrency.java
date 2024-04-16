@@ -21,12 +21,15 @@ public class DexCurrency {
 
     Double absoluteCurrentValue;
 
+    String fundingTime;
+
     @Override
     public String toString() {
         return  "Биржа: " + name + "\n" +
                 "Валюта: " + currency + "\n" +
                 "Текущее значение: " + currentValue + "\n" +
                 "Следующее значение: " + nextValue + "\n" +
+                "Расчет финансирования: " + fundingTime + "\n" +
                 "-------------------------------\n";
     }
 }

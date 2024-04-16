@@ -79,6 +79,7 @@ public class DexRequestService {
                                             .name(dex.getDexName())
                                             .currentValue(fundingRate.getCurrentValue())
                                             .nextValue(fundingRate.getNextValue())
+                                            .fundingTime(fundingRate.getFundingTime())
                                             .build());
                         });
                 coinCollection.getQueue().add(currency);
