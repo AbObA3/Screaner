@@ -50,7 +50,7 @@ public class GateParser implements DexParser {
         Matcher matcher = pattern.matcher(string);
 
         if (matcher.find()) {
-            Instant instant = Instant.ofEpochMilli(Long.parseLong(matcher.group(1)));
+            Instant instant = Instant.ofEpochSecond(Long.parseLong(matcher.group(1)));
             return LocalDateTime.ofInstant(instant, ZoneId.of("Europe/Moscow")).format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
         } else {
             log.error("Не найдено");
