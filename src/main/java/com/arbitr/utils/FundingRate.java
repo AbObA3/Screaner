@@ -17,6 +17,8 @@ public class FundingRate {
 
     Double nextValue;
 
-    String fundingTime;
+    Integer fundingInterval;
+
+    Long nextRateTimestamp;
 
 }

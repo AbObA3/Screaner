@@ -23,7 +23,7 @@ public class HTX implements Dex {
 
     private static final String FUNDING_BASE_PATH = "https://api.hbdm.com";
     private static final String FUNDING = "/linear-swap-api/v1/swap_funding_rate?contract_code=%s";
-
+    private static final String FUNDING_TIME  = "/linear-swap-api/v1/swap_historical_funding_rate?page_size=1&contract_code=%s";
     @Override
     public String getDexName() {
         return HTX;
@@ -34,6 +34,22 @@ public class HTX implements Dex {
     @Override
     public Double getBalance() {
         return null;
+    }
+
+    @Override
+    public String getFundingTime(String currency) {
+        var result = Strings.EMPTY;
+        try (var client = HttpClients.custom().build()) {
+            var request = RequestBuilder.get()
+                    .setUri(String.format(FUNDING_BASE_PATH + FUNDING_TIME, currency + SeparatorEnum.HTX.getFundingSeparator() + USDT))
+                    .build();
+            var httpResponse = client.execute(request);
+            result = EntityUtils.toString(httpResponse.getEntity());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return Strings.EMPTY;
+        }
+        return result;
     }
 
     @Override

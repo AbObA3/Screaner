@@ -3,6 +3,7 @@ package com.arbitr.service;
 import com.arbitr.config.CoinCollection;
 import com.arbitr.dex.*;
 import io.smallrye.common.annotation.RunOnVirtualThread;
+import io.vertx.core.impl.ConcurrentHashSet;
 import jakarta.inject.Inject;
 import com.arbitr.model.DexCurrency;
 import com.arbitr.parser.ValueParser;
@@ -12,15 +13,12 @@ import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.extern.log4j.Log4j2;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 @ApplicationScoped
 @Log4j2
 public class DexRequestService {
-
-    List<Dex> dexes;
+    ConcurrentHashSet<Dex> dexes;
 
     @Inject
     CoinCollection coinCollection;
@@ -61,7 +59,8 @@ public class DexRequestService {
 
     @PostConstruct
     void init() {
-        dexes = new ArrayList<>(Arrays.asList(gate, bingX, bitGet, byBit, mexc, okx, htx, kuCoin, lBank));
+        dexes = new ConcurrentHashSet<>();
+        dexes.addAll(Arrays.asList(gate, bingX, bitGet, byBit, mexc, okx, htx, kuCoin, lBank));
     }
 
     @Scheduled(every = "0.5s")
@@ -79,8 +78,10 @@ public class DexRequestService {
                                             .name(dex.getDexName())
                                             .currentValue(fundingRate.getCurrentValue())
                                             .nextValue(fundingRate.getNextValue())
-                                            .fundingTime(fundingRate.getFundingTime())
+                                            .fundingInterval(fundingRate.getFundingInterval())
+                                            .nextRateTimestamp(fundingRate.getNextRateTimestamp())
                                             .build());
+
                         });
                 coinCollection.getQueue().add(currency);
             }

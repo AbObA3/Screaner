@@ -2,6 +2,7 @@ package com.arbitr.parser;
 
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Singleton;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -14,12 +15,16 @@ import java.util.regex.Pattern;
 
 @NoArgsConstructor
 @Log4j2
-@ApplicationScoped
+@Singleton
 public class MexcParser implements DexParser {
+
+    private Long time = 0L;
     @Override
     public Double getFundingRate(String string) {
-        Pattern pattern = Pattern.compile("\"fundingRate\"\\s*:\\s*([^,]+),");
-        Matcher matcher = pattern.matcher(string);
+        var pattern = Pattern.compile("\"fundingRate\"\\s*:\\s*([^,]+),");
+        var matcher = pattern.matcher(string);
+
+        setTime(string);
 
         if (matcher.find()) {
             return Double.parseDouble(matcher.group(1)) * 100.;
@@ -29,17 +34,36 @@ public class MexcParser implements DexParser {
         }
     }
 
-    @Override
-    public String getFundingTime(String string) {
-        Pattern pattern = Pattern.compile("\"nextSettleTime\"\\s*:\\s*([^,]+),");
-        Matcher matcher = pattern.matcher(string);
+    private void setTime(String string) {
+        var pattern = Pattern.compile("\"nextSettleTime\"\\s*:\\s*([^,]+),");
+        var matcher = pattern.matcher(string);
 
         if (matcher.find()) {
-            Instant instant = Instant.ofEpochMilli(Long.parseLong(matcher.group(1)));
-            return LocalDateTime.ofInstant(instant, ZoneId.of("Europe/Moscow")).format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
+            this.time = Long.parseLong(matcher.group(1));
         } else {
             log.error("Не найдено");
-            return LocalDateTime.MIN.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
+            this.time = 0L;
+        }
+    }
+
+    @Override
+    public Long getFundingNextTime(String string) {
+        return this.time;
+    }
+
+
+    @Override
+    public Integer getFundingInterval(String string) {
+        var pattern = Pattern.compile("\"settleTime\"\\s*:\\s*([^,]+),");
+        var matcher = pattern.matcher(string);
+
+        if (matcher.find() && this.time != 0L) {
+            var instant = Instant.ofEpochMilli(this.time - Long.parseLong(matcher.group(1)));
+            var hours = LocalDateTime.ofInstant(instant, ZoneId.of("GMT")).getHour();
+            return hours;
+        } else {
+            log.error("Не найдено");
+            return 0;
         }
     }
 }

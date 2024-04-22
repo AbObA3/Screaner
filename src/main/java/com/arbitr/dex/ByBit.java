@@ -21,15 +21,13 @@ public class ByBit implements Dex{
 
     private static final String BASE_PATH = "https://api.bybit.com";
     private static final String FUNDING = "/v5/market/tickers?category=linear&symbol=%s";
+    private static final String FUNDING_TIME = "/v5/market/funding/history?category=linear&limit=1&symbol=%s";
     private static final String USDT = "USDT";
-
 
     @Override
     public String getDexName() {
         return BYBIT;
     }
-
-
 
     @Override
     public Double getBalance() {
@@ -52,4 +50,22 @@ public class ByBit implements Dex{
         }
         return result;
     }
+
+    @Override
+    public String getFundingTime(String currency) {
+        var result = Strings.EMPTY;
+        try (var client = HttpClients.custom().build()) {
+            var request = RequestBuilder.get()
+                    .setUri(String.format(BASE_PATH + FUNDING_TIME, currency + SeparatorEnum.BYBIT.getFundingSeparator() + USDT))
+                    .build();
+            var httpResponse = client.execute(request);
+            result = EntityUtils.toString(httpResponse.getEntity());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return Strings.EMPTY;
+        }
+        return result;
+    }
+
+
 }

@@ -2,12 +2,17 @@ package com.arbitr.parser;
 
 import com.arbitr.dex.Dex;
 import com.arbitr.utils.FundingRate;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import lombok.extern.log4j.Log4j2;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.arbitr.utils.Names.*;
 
 @ApplicationScoped
+@Log4j2
 public class ValueParser {
 
     @Inject
@@ -37,80 +42,39 @@ public class ValueParser {
     @Inject
     LBankParser lBankParser;
 
+    ConcurrentHashMap<String, DexParser> parsers;
+
+    @PostConstruct
+    void init() {
+        parsers = new ConcurrentHashMap<>();
+        parsers.put(BITGET, bitGetParser);
+        parsers.put(BYBIT, byBitParser);
+        parsers.put(GATE, gateParser);
+        parsers.put(HTX, htxParser);
+        parsers.put(KUCOIN, kuCoinParser);
+        parsers.put(MEXC, mexcParser);
+        parsers.put(OKX, okxParser);
+        parsers.put(BINGX, bingXParser);
+        parsers.put(LBANK, lBankParser);
+    }
 
     public FundingRate parseFundingData(Dex dex, String currency) {
 
-        var response  = dex.getFundingData(currency);
+        try {
+            var responseData = dex.getFundingData(currency);
+            var responseInterval = dex.getFundingTime(currency);
 
-        switch (dex.getDexName()) {
-            case BITGET -> {
-                var time = dex.getFundingTime(currency);
-                return FundingRate.builder()
-                                  .currentValue(bitGetParser.getFundingRate(response))
-                                  .nextValue(bitGetParser.getNextFundingRate(response))
-                                  .fundingTime(bitGetParser.getFundingTime(time))
-                                  .build();
-            }
-            case BYBIT -> {
-                return FundingRate.builder()
-                                  .currentValue(byBitParser.getFundingRate(response))
-                                  .nextValue(byBitParser.getNextFundingRate(response))
-                                  .fundingTime(byBitParser.getFundingTime(response))
-                                  .build();
-            }
-            case GATE -> {
-                var time = dex.getFundingTime(currency);
-                return FundingRate.builder()
-                                  .currentValue(gateParser.getFundingRate(response))
-                                  .nextValue(gateParser.getNextFundingRate(response))
-                                  .fundingTime(gateParser.getFundingTime(time))
-                                  .build();
-            }
-            case HTX -> {
-                return FundingRate.builder()
-                                  .currentValue(htxParser.getFundingRate(response))
-                                  .nextValue(htxParser.getNextFundingRate(response))
-                                  .fundingTime(htxParser.getFundingTime(response))
-                                  .build();
-            }
-            case KUCOIN -> {
-                return FundingRate.builder()
-                                  .currentValue(kuCoinParser.getFundingRate(response))
-                                  .nextValue(kuCoinParser.getNextFundingRate(response))
-                                  .fundingTime(kuCoinParser.getFundingTime(response))
-                                  .build();
-            }
-            case MEXC -> {
-                return FundingRate.builder()
-                                  .currentValue(mexcParser.getFundingRate(response))
-                                  .nextValue(mexcParser.getNextFundingRate(response))
-                                  .fundingTime(mexcParser.getFundingTime(response))
-                                  .build();
-            }
-            case OKX -> {
-                return FundingRate.builder()
-                                  .currentValue(okxParser.getFundingRate(response))
-                                  .nextValue(okxParser.getNextFundingRate(response))
-                                  .fundingTime(okxParser.getFundingTime(response))
-                                  .build();
-            }
-            case BINGX -> {
-                return FundingRate.builder()
-                                  .currentValue(bingXParser.getFundingRate(response))
-                                  .nextValue(bingXParser.getNextFundingRate(response))
-                                  .fundingTime(bingXParser.getFundingTime(response))
-                                  .build();
-            }
-            case LBANK -> {
-                return FundingRate.builder()
-                                  .currentValue(lBankParser.getFundingRate(response))
-                                  .nextValue(lBankParser.getNextFundingRate(response))
-                                  .fundingTime(lBankParser.getFundingTime(response))
-                                  .build();
-            }
-            default -> {
-                return null;
-            }
+            var parser = parsers.get(dex.getDexName());
+
+            return FundingRate.builder()
+                    .currentValue(parser.getFundingRate(responseData))
+                    .nextValue(parser.getNextFundingRate(responseData))
+                    .fundingInterval(parser.getFundingInterval(responseInterval))
+                    .nextRateTimestamp(parser.getFundingNextTime(responseInterval))
+                    .build();
+        } catch ( Exception ex) {
+            log.error(ex.getMessage());
+            return null;
         }
 
     }

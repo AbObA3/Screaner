@@ -27,7 +27,8 @@ public class DatabaseInitCassandra implements DatabaseInit {
                 "    current_value          DOUBLE,\n" +
                 "    next_value             DOUBLE,\n" +
                 "    absolute_current_value DOUBLE,\n" +
-                "    funding_time           TEXT,\n" +
+                "    funding_interval       INT,\n" +
+                "    next_rate_timestamp    BIGINT,\n" +
                 "    last_update_timestamp  TIMESTAMP ,\n" +
                 "    primary key (currency, name)\n" +
                 ");");

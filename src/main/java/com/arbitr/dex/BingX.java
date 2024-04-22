@@ -22,6 +22,7 @@ public class BingX implements Dex {
 
     private static final String BASE_PATH = "https://open-api.bingx.com";
     private static final String FUNDING = "/openApi/swap/v2/quote/premiumIndex?symbol=%S";
+    private static final String FUNDING_TIME = "/openApi/swap/v2/quote/fundingRate?limit=1&symbol=%s";
 
     @Override
     public String getDexName() {
@@ -48,4 +49,22 @@ public class BingX implements Dex {
         }
         return result;
     }
+
+    @Override
+    public String getFundingTime(String currency) {
+        var result = Strings.EMPTY;
+        try (var client = HttpClients.custom().build()) {
+            var request = RequestBuilder.get()
+                    .setUri(String.format(BASE_PATH + FUNDING_TIME, currency + SeparatorEnum.BINGX.getFundingSeparator() + USDT))
+                    .build();
+            var httpResponse = client.execute(request);
+            result = EntityUtils.toString(httpResponse.getEntity());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return Strings.EMPTY;
+        }
+        return result;
+    }
+
+
 }

@@ -23,8 +23,7 @@ public class BitGet implements Dex {
 
     private static final String BASE_PATH = "https://api.bitget.com";
     private static final String FUNDING = "/api/mix/v1/market/current-fundRate?symbol=%S_UMCBL";
-    private static final String FUNDING_TIME = "/api/v2/mix/market/funding-time?productType=usdt-futures&symbol=%s";
-
+    private static final String FUNDING_NEXT_TIME = "/api/v2/mix/market/funding-time?productType=usdt-futures&symbol=%s";
     @Override
     public String getDexName() {
         return BITGET;
@@ -56,7 +55,7 @@ public class BitGet implements Dex {
         var result = Strings.EMPTY;
         try (var client = HttpClients.custom().build()) {
             var request = RequestBuilder.get()
-                    .setUri(String.format(BASE_PATH + FUNDING_TIME, currency + SeparatorEnum.BITGET.getFundingSeparator() + USDT))
+                    .setUri(String.format(BASE_PATH + FUNDING_NEXT_TIME, currency + SeparatorEnum.BITGET.getFundingSeparator() + USDT))
                     .build();
             var httpResponse = client.execute(request);
             result = EntityUtils.toString(httpResponse.getEntity());

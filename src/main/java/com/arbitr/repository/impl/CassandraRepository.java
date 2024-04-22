@@ -24,7 +24,8 @@ public class CassandraRepository implements Repository {
                 .currentValue(reactiveRow.getDouble("current_value"))
                 .nextValue(reactiveRow.getDouble("next_value"))
                 .absoluteCurrentValue(reactiveRow.getDouble("absolute_current_value"))
-                .fundingTime(reactiveRow.getString("funding_time"))
+                .fundingInterval(reactiveRow.getInt("funding_interval"))
+                .nextRateTimestamp(reactiveRow.getLong("next_rate_timestamp"))
                 .build();
     }
 
@@ -34,30 +35,29 @@ public class CassandraRepository implements Repository {
     }
 
     public Multi<DexCurrency> findAll() {
-        Multi<ReactiveRow> dexes = session.executeReactive("select name, currency, current_value, next_value, funding_time, absolute_current_value from dex.dexes_actual");
+        Multi<ReactiveRow> dexes = session.executeReactive("select name, currency, current_value, next_value, funding_interval, next_rate_timestamp, absolute_current_value from dex.dexes_actual");
         return dexes.onItem().transform(this::from);
     }
 
     @Override
     public Multi<DexCurrency> findAllByCurrency(String currency) {
-        Multi<ReactiveRow> dexes = session.executeReactive(String.format("select name, currency, current_value, next_value, funding_time, absolute_current_value from dex.dexes_actual where currency = '%s'", currency));
+        Multi<ReactiveRow> dexes = session.executeReactive(String.format("select name, currency, current_value, next_value, funding_interval, next_rate_timestamp, absolute_current_value from dex.dexes_actual where currency = '%s'", currency));
         return dexes.onItem().transform(this::from);
     }
 
     @Override
     public Multi<DexCurrency> findAllByAbsoluteValue(Double value) {
-        Multi<ReactiveRow> dexes = session.executeReactive(String.format("select name, currency, current_value, next_value, funding_time, absolute_current_value from dex.dexes_actual where absolute_current_value >= %f allow filtering", value));
+        Multi<ReactiveRow> dexes = session.executeReactive(String.format("select name, currency, current_value, next_value, funding_interval, next_rate_timestamp, absolute_current_value from dex.dexes_actual where absolute_current_value >= %f allow filtering", value));
         return dexes.onItem().transform(this::from);
     }
 
 
     @Override
     public Uni<Boolean> putDex(DexCurrency dexCurrency) {
-        var insert = session.executeAsync(String.format("insert into dex.dexes_actual(currency, name, last_update_timestamp, current_value, next_value, funding_time, absolute_current_value) values ('%s','%s', totimestamp(now()), %.4f, %.4f, '%s', %.4f)"
-                , dexCurrency.getCurrency(), dexCurrency.getName(), dexCurrency.getCurrentValue(), dexCurrency.getNextValue(), dexCurrency.getFundingTime(), Math.abs(dexCurrency.getCurrentValue())));
+        var insert = session.executeAsync(String.format("insert into dex.dexes_actual(currency, name, last_update_timestamp, current_value, next_value, funding_interval, next_rate_timestamp, absolute_current_value) values ('%s','%s', totimestamp(now()), %.4f, %.4f, %d, %d, %.4f)"
+                , dexCurrency.getCurrency(), dexCurrency.getName(), dexCurrency.getCurrentValue(), dexCurrency.getNextValue(), dexCurrency.getFundingInterval(), dexCurrency.getNextRateTimestamp(), Math.abs(dexCurrency.getCurrentValue())));
         return Uni.createFrom().completionStage(insert).map(AsyncResultSet::wasApplied);
     }
-
 
 
 }
