@@ -63,7 +63,7 @@ public class DexRequestService {
         dexes.addAll(Arrays.asList(gate, bingX, bitGet, byBit, mexc, okx, htx, kuCoin, lBank));
     }
 
-    @Scheduled(every = "0.5s")
+    @Scheduled(every = "1s")
     @RunOnVirtualThread
     void checkDexes() {
         try {
